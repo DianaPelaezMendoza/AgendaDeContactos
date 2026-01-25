@@ -1,4 +1,4 @@
-package com.example.principal.ui.theme
+package com.example.principal.navigation
 
 enum class NavigationRoutes {
     LoginScreen,

@@ -1,4 +1,4 @@
-package com.example.principal.ui.theme
+package com.example.principal.ui.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.principal.navigation.NavigationRoutes
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
