@@ -15,6 +15,7 @@ import com.example.principal.ui.home.components.ContactItem
 import com.example.principal.util.NetworkUtils
 import com.example.principal.viewmodel.HomeUiState
 import com.example.principal.viewmodel.HomeViewModel
+import androidx.compose.runtime.collectAsState
 
 @Composable
 fun HomeScreen(
