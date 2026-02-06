@@ -12,6 +12,7 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
+import kotlin.jvm.java
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -25,27 +26,31 @@ object AppModule {
     // Retrofit
     @Provides
     @Singleton
-    fun provideRetrofit(baseUrl: String): Retrofit =
-        Retrofit.Builder()
+    fun provideRetrofit(baseUrl: String): Retrofit {
+        return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
 
     // ApiService
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService =
-        retrofit.create(ApiService::class.java)
+    fun provideApiService(retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
+    }
 
     // Room Database
     @Provides
     @Singleton
-    fun provideDatabase(app: Application): AppDatabase =
-        Room.databaseBuilder(app, AppDatabase::class.java, "contacts_db")
+    fun provideDatabase(app: Application): AppDatabase {
+         return Room.databaseBuilder(app, AppDatabase::class.java, "contacts_db")
             .build()
-
+    }
     // DAO
     @Provides
     @Singleton
-    fun provideContactDao(db: AppDatabase): ContactDao = db.contactDao()
+    fun provideContactDao(db: AppDatabase): ContactDao {
+        return db.contactDao()
+    }
 }

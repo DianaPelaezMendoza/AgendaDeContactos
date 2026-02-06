@@ -1,5 +1,6 @@
 package com.example.principal.ui.home
 
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.principal.ui.home.components.ContactItem
-import com.example.principal.util.NetworkUtils
 import com.example.principal.viewmodel.HomeUiState
 import com.example.principal.viewmodel.HomeViewModel
 import androidx.compose.runtime.collectAsState
@@ -26,8 +26,6 @@ fun HomeScreen(
     val context = LocalContext.current
 
     // Observa el estado de conectividad
-    LaunchedEffect(Unit) { NetworkUtils.observeNetwork(context) }
-    val isOnline by NetworkUtils.isOnline.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
 
@@ -38,19 +36,9 @@ fun HomeScreen(
         ) {
             Button(
                 onClick = { viewModel.importContacts() },
-                enabled = isOnline
             ) {
                 Text("Importar contactos")
             }
-        }
-
-        // Mensaje de conexión
-        if (!isOnline) {
-            Text(
-                text = "Sin conexión",
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(top = 8.dp)
-            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))

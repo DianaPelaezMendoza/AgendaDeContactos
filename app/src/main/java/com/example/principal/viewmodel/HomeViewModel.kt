@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.principal.data.local.entity.ContactEntity
 import com.example.principal.data.repository.ContactRepository
-import com.example.principal.util.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -20,7 +19,6 @@ sealed class HomeUiState {
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: ContactRepository,
-    private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)

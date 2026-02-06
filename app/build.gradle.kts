@@ -7,13 +7,13 @@ plugins {
 }
 
 android {
-    namespace = "com.bdc.agendabdc"
+    namespace = "com.example.principal"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.bdc.agendabdc"
+        applicationId = "com.example.principal"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

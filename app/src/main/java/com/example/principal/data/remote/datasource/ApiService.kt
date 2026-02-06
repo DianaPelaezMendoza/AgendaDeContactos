@@ -6,7 +6,7 @@ import retrofit2.http.Query
 
 interface ApiService {
 
-    @GET("/")
+    @GET(".")
     suspend fun getContacts(
         @Query("results") results: Int = 10
     ): ApiResponse
