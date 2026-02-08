@@ -21,6 +21,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,27 +35,47 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.principal.data.local.dao.ContactSource
 import com.example.principal.data.local.entity.ContactEntity
+import com.example.principal.viewmodel.AddEditContactViewModel
 import com.example.principal.viewmodel.HomeViewModel
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditContactScreen(
     navController: NavHostController,
-    viewModel: HomeViewModel = hiltViewModel(),
-    contact: ContactEntity? = null // Si es null, estamos creando un contacto nuevo
+    contact: ContactEntity? = null // null si es creación
 ) {
-    // Estados para los campos del formulario
-    var firstName by remember { mutableStateOf(contact?.firstName ?: "") }
-    var lastName by remember { mutableStateOf(contact?.lastName ?: "") }
-    var city by remember { mutableStateOf(contact?.city ?: "") }
-    var state by remember { mutableStateOf(contact?.state ?: "") }
-    var phone by remember { mutableStateOf(contact?.phone ?: "") }
-    var email by remember { mutableStateOf(contact?.email ?: "") }
+    val viewModel: AddEditContactViewModel = hiltViewModel()
+
+    // Cargar contacto si existe
+    LaunchedEffect(contact) {
+        viewModel.loadContact(contact)
+    }
+
+    val existingContact by viewModel.contact.collectAsState()
+
+    // Estados de los campos del formulario
+    var firstName by remember { mutableStateOf(existingContact?.firstName ?: "") }
+    var lastName by remember { mutableStateOf(existingContact?.lastName ?: "") }
+    var city by remember { mutableStateOf(existingContact?.city ?: "") }
+    var state by remember { mutableStateOf(existingContact?.state ?: "") }
+    var phone by remember { mutableStateOf(existingContact?.phone ?: "") }
+    var email by remember { mutableStateOf(existingContact?.email ?: "") }
+
+    // Actualizar estados cuando el contacto cargue
+    LaunchedEffect(existingContact) {
+        existingContact?.let {
+            firstName = it.firstName
+            lastName = it.lastName
+            city = it.city
+            state = it.state
+            phone = it.phone
+            email = it.email
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (contact == null) "Crear contacto" else "Editar contacto") },
+                title = { Text(if (existingContact == null) "Crear contacto" else "Editar contacto") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -69,7 +91,7 @@ fun AddEditContactScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Campos de formulario
+                // Campos del formulario
                 OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
@@ -118,21 +140,20 @@ fun AddEditContactScreen(
                 ) {
                     Button(
                         onClick = {
-                            // Guardar contacto en Room
                             val newContact = ContactEntity(
-                                id = contact?.id ?: 0, // Si existe, mantenemos el id
+                                id = existingContact?.id ?: 0,
                                 firstName = firstName,
                                 lastName = lastName,
                                 city = city,
                                 state = state,
                                 phone = phone,
                                 email = email,
-                                thumbnail = contact?.thumbnail ?: "",
-                                image = contact?.image ?: "",
-                                source = contact?.source ?: ContactSource.CREATED
+                                thumbnail = existingContact?.thumbnail ?: "",
+                                image = existingContact?.image ?: "",
+                                source = existingContact?.source ?: ContactSource.CREATED
                             )
-                            viewModel.addOrUpdateContact(newContact)
-                            navController.popBackStack() // Volver a HomeScreen
+                            viewModel.saveContact(newContact)
+                            navController.popBackStack()
                         },
                         modifier = Modifier.weight(1f)
                     ) {

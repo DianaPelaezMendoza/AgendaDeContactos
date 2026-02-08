@@ -9,30 +9,17 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
-
-// ----------------------------------
-// Estado de UI para HomeScreen
-// ----------------------------------
-sealed class HomeUiState {
-    object Loading : HomeUiState()
-    data class Success(val contacts: List<ContactEntity>) : HomeUiState()
-    data class Error(val message: String) : HomeUiState()
-}
-
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repository: ContactRepository,
+    private val repository: ContactRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    // Flujo de contactos desde Room
     val contactsFlow: Flow<List<ContactEntity>> = repository.getContacts()
 
     init {
-        // Observamos Room y actualizamos la UI automáticamente
         viewModelScope.launch {
             contactsFlow.collect { list ->
                 _uiState.value = HomeUiState.Success(list)
@@ -40,11 +27,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-
-
-    // ----------------------------------
-    // IMPORTAR CONTACTOS DESDE API CON LÍMITE, 30 lim
-    // ----------------------------------
     fun importContactsFromApi(limit: Int) {
         viewModelScope.launch {
             _uiState.value = HomeUiState.Loading
@@ -56,21 +38,19 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // ----------------------------------
-    // CREAR O EDITAR CONTACTO (Room decide)
-    // ----------------------------------
     fun addOrUpdateContact(contact: ContactEntity) {
-        viewModelScope.launch {
-            repository.insertOrUpdate(contact)
-        }
+        viewModelScope.launch { repository.insertOrUpdate(contact) }
     }
 
-    // ----------------------------------
-    // ELIMINAR CONTACTO
-    // ----------------------------------
     fun deleteContact(contact: ContactEntity) {
-        viewModelScope.launch {
-            repository.deleteContact(contact)
-        }
+        viewModelScope.launch { repository.deleteContact(contact) }
     }
+
+    suspend fun getContactByIdSync(id: Int): ContactEntity? {
+        return repository.getContactById(id)
+    }
+
+    fun getImportedContacts(): Flow<List<ContactEntity>> = repository.getImportedContacts()
+    fun getCreatedContacts(): Flow<List<ContactEntity>> = repository.getCreatedContacts()
 }
+
