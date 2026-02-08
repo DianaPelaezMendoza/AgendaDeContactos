@@ -39,7 +39,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun addOrUpdateContact(contact: ContactEntity) {
-        viewModelScope.launch { repository.insertOrUpdate(contact) }
+        viewModelScope.launch {
+            repository.insertOrUpdate(contact)
+        }
     }
 
     fun deleteContact(contact: ContactEntity) {

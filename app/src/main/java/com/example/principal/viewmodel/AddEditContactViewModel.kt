@@ -1,11 +1,9 @@
 package com.example.principal.viewmodel
 
-import com.example.principal.data.local.entity.ContactEntity
-import com.example.principal.data.repository.ContactRepository
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
+import com.example.principal.data.local.entity.ContactEntity
+import com.example.principal.data.repository.ContactRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,16 +18,19 @@ class AddEditContactViewModel @Inject constructor(
     private val _contact = MutableStateFlow<ContactEntity?>(null)
     val contact: StateFlow<ContactEntity?> = _contact
 
-    // Cargar un contacto existente (para editar)
-    fun loadContact(contacto: ContactEntity?) {
-        _contact.value = contacto
+    fun loadContact(contact: ContactEntity?) {
+        _contact.value = contact
     }
 
-    // Guardar un contacto nuevo o actualizar uno existente
-    fun saveContact(contacto: ContactEntity) {
+    fun saveContact(contact: ContactEntity) {
         viewModelScope.launch {
-            repository.insertOrUpdate(contacto)
+            repository.insertOrUpdate(contact)
         }
     }
 
+    fun deleteContact(contact: ContactEntity) {
+        viewModelScope.launch {
+            repository.deleteContact(contact)
+        }
+    }
 }

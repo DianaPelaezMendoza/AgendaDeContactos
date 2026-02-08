@@ -36,23 +36,22 @@ import androidx.navigation.NavHostController
 import com.example.principal.data.local.dao.ContactSource
 import com.example.principal.data.local.entity.ContactEntity
 import com.example.principal.viewmodel.AddEditContactViewModel
-import com.example.principal.viewmodel.HomeViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditContactScreen(
     navController: NavHostController,
-    contact: ContactEntity? = null // null si es creación
+    contact: ContactEntity? = null
 ) {
     val viewModel: AddEditContactViewModel = hiltViewModel()
 
-    // Cargar contacto si existe
+    // Cargar contacto
     LaunchedEffect(contact) {
         viewModel.loadContact(contact)
     }
 
     val existingContact by viewModel.contact.collectAsState()
 
-    // Estados de los campos del formulario
     var firstName by remember { mutableStateOf(existingContact?.firstName ?: "") }
     var lastName by remember { mutableStateOf(existingContact?.lastName ?: "") }
     var city by remember { mutableStateOf(existingContact?.city ?: "") }
@@ -60,7 +59,6 @@ fun AddEditContactScreen(
     var phone by remember { mutableStateOf(existingContact?.phone ?: "") }
     var email by remember { mutableStateOf(existingContact?.email ?: "") }
 
-    // Actualizar estados cuando el contacto cargue
     LaunchedEffect(existingContact) {
         existingContact?.let {
             firstName = it.firstName
@@ -92,52 +90,16 @@ fun AddEditContactScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Campos del formulario
-                OutlinedTextField(
-                    value = firstName,
-                    onValueChange = { firstName = it },
-                    label = { Text("Nombre") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = lastName,
-                    onValueChange = { lastName = it },
-                    label = { Text("Apellido") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = city,
-                    onValueChange = { city = it },
-                    label = { Text("Ciudad") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = state,
-                    onValueChange = { state = it },
-                    label = { Text("Estado") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = phone,
-                    onValueChange = { phone = it },
-                    label = { Text("Teléfono") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                OutlinedTextField(value = firstName, onValueChange = { firstName = it }, label = { Text("Nombre") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = lastName, onValueChange = { lastName = it }, label = { Text("Apellido") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = city, onValueChange = { city = it }, label = { Text("Ciudad") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = state, onValueChange = { state = it }, label = { Text("Estado") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = phone, onValueChange = { phone = it }, label = { Text("Teléfono") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), modifier = Modifier.fillMaxWidth())
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Botones Guardar y Cancelar
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Button(
                         onClick = {
                             val newContact = ContactEntity(
@@ -156,17 +118,26 @@ fun AddEditContactScreen(
                             navController.popBackStack()
                         },
                         modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Guardar")
-                    }
+                    ) { Text("Guardar") }
 
                     Button(
                         onClick = { navController.popBackStack() },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
                         modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Cancelar")
-                    }
+                    ) { Text("Cancelar") }
+                }
+
+                // Botón eliminar solo si es edición
+                if (existingContact != null) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            viewModel.deleteContact(existingContact!!)
+                            navController.popBackStack()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text("Eliminar", color = Color.White) }
                 }
             }
         }

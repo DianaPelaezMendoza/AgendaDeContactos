@@ -30,7 +30,6 @@ navigationComposeV = "2.9.6"
 coilVersion = "2.6.0"
 material3 = "1.4.0"
 runtime = "1.10.2"
-uiGraphics = "1.10.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -70,7 +69,6 @@ androix-navigation = { group = "androidx.navigation", name = "navigation-compose
 androidx-coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilVersion" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
-androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
