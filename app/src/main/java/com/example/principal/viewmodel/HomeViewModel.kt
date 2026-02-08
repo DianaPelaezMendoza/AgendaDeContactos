@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// ----------------------------------
 // Estado de UI para HomeScreen
+// ----------------------------------
 sealed class HomeUiState {
     object Loading : HomeUiState()
     data class Success(val contacts: List<ContactEntity>) : HomeUiState()
@@ -24,10 +26,11 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    // Flujo de contactos desde Room
     val contactsFlow: Flow<List<ContactEntity>> = repository.getContacts()
 
     init {
-        // Inicialmente cargamos contactos desde DB
+        // Observamos Room y actualizamos la UI automáticamente
         viewModelScope.launch {
             contactsFlow.collect { list ->
                 _uiState.value = HomeUiState.Success(list)
@@ -35,23 +38,47 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Importa contactos desde la API y los guarda en la DB
-     */
+    // ----------------------------------
+    // IMPORTAR CONTACTOS (SIN LÍMITE)
+    // ----------------------------------
     fun importContacts() {
         viewModelScope.launch {
             _uiState.value = HomeUiState.Loading
             try {
-                repository.importContacts()
+                repository.importContacts(limit)
             } catch (e: Exception) {
                 _uiState.value = HomeUiState.Error("Error al importar contactos")
             }
         }
     }
 
-    /**
-     * Elimina un contacto de la DB
-     */
+    // ----------------------------------
+    // IMPORTAR CONTACTOS DESDE API CON LÍMITE
+    // (1–30, usado por el diálogo)
+    // ----------------------------------
+    fun importContactsFromApi(limit: Int) {
+        viewModelScope.launch {
+            _uiState.value = HomeUiState.Loading
+            try {
+                repository.importContacts(limit)
+            } catch (e: Exception) {
+                _uiState.value = HomeUiState.Error("Error al importar contactos")
+            }
+        }
+    }
+
+    // ----------------------------------
+    // CREAR O EDITAR CONTACTO (Room decide)
+    // ----------------------------------
+    fun addOrUpdateContact(contact: ContactEntity) {
+        viewModelScope.launch {
+            repository.insertOrUpdate(contact)
+        }
+    }
+
+    // ----------------------------------
+    // ELIMINAR CONTACTO
+    // ----------------------------------
     fun deleteContact(contact: ContactEntity) {
         viewModelScope.launch {
             repository.deleteContact(contact)

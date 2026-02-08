@@ -35,8 +35,4 @@ interface ContactDao {
     @Query("DELETE FROM contacts")
     suspend fun deleteAll()
 
-    //
-    @Query("SELECT * FROM contacts WHERE source = :source ORDER BY id DESC")
-    fun getContactsBySource(source: ContactSource): Flow<List<ContactEntity>>
-
 }

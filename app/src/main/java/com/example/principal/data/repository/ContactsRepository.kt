@@ -17,7 +17,7 @@ class ContactRepository @Inject constructor(
     /**
      * Descarga contactos desde la API y los guarda en Room.
      */
-    suspend fun importContacts() {
+    suspend fun importContacts(limit: Int) {
 
         val response = apiService.getContacts()
 
