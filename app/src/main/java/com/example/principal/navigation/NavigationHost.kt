@@ -4,14 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.principal.ui.detail.DetailScreen
-import com.example.principal.ui.home.HomeScreen
+import com.example.principal.ui.screens.HomeScreen
 import com.example.principal.ui.login.LoginScreen
+import com.example.principal.ui.screens.AddEditContactScreen
+import com.example.principal.ui.screens.FilterScreen
 import com.example.principal.viewmodel.HomeUiState
 import com.example.principal.viewmodel.HomeViewModel
 
@@ -63,5 +66,19 @@ fun NavigationHost() {
             }
         }
 
+
+        composable("AddEditContact") {
+            AddEditContactScreen(navController)
+        }
+
+        composable("FilterScreen") {
+            FilterScreen(navController)
+        }
+
     }
+
+
+
 }
+
+

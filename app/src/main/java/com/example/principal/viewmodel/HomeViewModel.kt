@@ -2,6 +2,7 @@ package com.example.principal.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.principal.ui.screens.ContactFilter
 import com.example.principal.data.local.entity.ContactEntity
 import com.example.principal.data.repository.ContactRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +16,10 @@ sealed class HomeUiState {
     data class Success(val contacts: List<ContactEntity>) : HomeUiState()
     data class Error(val message: String) : HomeUiState()
 }
+//nuevo
+
+private val _filter = MutableStateFlow(ContactFilter.ALL)
+
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -26,10 +31,16 @@ class HomeViewModel @Inject constructor(
 
     val contactsFlow: Flow<List<ContactEntity>> = repository.getContacts()
 
+//NUEVO
     init {
-        // Inicialmente cargamos contactos desde DB
         viewModelScope.launch {
-            contactsFlow.collect { list ->
+            _filter.flatMapLatest { filter ->
+                when (filter) {
+                    ContactFilter.ALL -> repository.getContacts()
+                    ContactFilter.IMPORTED -> repository.getImportedContacts()
+                    ContactFilter.CREATED -> repository.getCreatedContacts()
+                }
+            }.collect { list ->
                 _uiState.value = HomeUiState.Success(list)
             }
         }
@@ -57,4 +68,19 @@ class HomeViewModel @Inject constructor(
             repository.deleteContact(contact)
         }
     }
+//NUEVO
+    fun setFilter(filter: ContactFilter) {
+        _filter.value = filter
+    }
+
+
+    //NUEVO
+    fun addOrUpdateContact(contact: ContactEntity) {
+        viewModelScope.launch {
+            repository.insertOrUpdate(contact)
+        }
+
 }
+
+}
+

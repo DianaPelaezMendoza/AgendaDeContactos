@@ -2,6 +2,7 @@ package com.example.principal.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.principal.data.local.dao.ContactSource
 
 @Entity(tableName = "contacts")
 data class ContactEntity(
@@ -18,6 +19,8 @@ data class ContactEntity(
     val phone: String,
     val email: String,
 
-    val thumbnail: String,
-    val image: String
+    val thumbnail: String = "",
+    val image: String = "",
+
+    val source: ContactSource
 )

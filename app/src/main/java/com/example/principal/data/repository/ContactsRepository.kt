@@ -1,6 +1,7 @@
 package com.example.principal.data.repository
 
 import com.example.principal.data.local.dao.ContactDao
+import com.example.principal.data.local.dao.ContactSource
 import com.example.principal.data.local.entity.ContactEntity
 import com.example.principal.data.remote.datasource.ApiService
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +31,8 @@ class ContactRepository @Inject constructor(
                 phone = user.phone,
                 email = user.email,
                 thumbnail = user.picture.thumbnail,
-                image = user.picture.large
+                image = user.picture.large,
+                source = ContactSource.IMPORTED
             )
 
             dao.insertContact(entity)
@@ -54,4 +56,20 @@ class ContactRepository @Inject constructor(
     suspend fun deleteAll() {
         dao.deleteAll()
     }
+
+
+    //Nuevo
+    fun getImportedContacts(): Flow<List<ContactEntity>> {
+        return dao.getContactsBySource(ContactSource.IMPORTED)
+    }
+
+    fun getCreatedContacts(): Flow<List<ContactEntity>> {
+        return dao.getContactsBySource(ContactSource.CREATED)
+    }
+
+    suspend fun insertOrUpdate(contact: ContactEntity) {
+        dao.insertContact(contact) // REPLACE ya hace update si existe el mismo id
+    }
+
+
 }
