@@ -8,9 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
-
 
 /**
  * ViewModel para la pantalla de creación o edición de contactos.
@@ -23,6 +21,7 @@ import javax.inject.Inject
  *
  * @param repository Repositorio que maneja la persistencia de los contactos.
  */
+
 @HiltViewModel
 class AddEditContactViewModel @Inject constructor(
     private val repository: ContactRepository
@@ -31,24 +30,16 @@ class AddEditContactViewModel @Inject constructor(
     private val _contact = MutableStateFlow<ContactEntity?>(null)
     val contact: StateFlow<ContactEntity?> = _contact
 
-    // Load contact by ID and collect the Flow to update UI
-    fun loadContact(contactId: Int) {
-        viewModelScope.launch {
-            // Collect the flow to get the contact
-            repository.getContactById(contactId).collect { contact ->
-                _contact.value = contact
-            }
-        }
+    fun loadContact(contact: ContactEntity?) {
+        _contact.value = contact
     }
 
-    // Save or update the contact to the repository
     fun saveContact(contact: ContactEntity) {
         viewModelScope.launch {
             repository.insertOrUpdate(contact)
         }
     }
 
-    // Delete the contact from the repository
     fun deleteContact(contact: ContactEntity) {
         viewModelScope.launch {
             repository.deleteContact(contact)

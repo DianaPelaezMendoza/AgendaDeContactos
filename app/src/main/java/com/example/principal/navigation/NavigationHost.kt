@@ -1,6 +1,8 @@
 package com.example.principal.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -9,10 +11,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.principal.ui.detail.DetailScreen
 import com.example.principal.ui.login.LoginScreen
+import com.example.principal.ui.screens.APIScreen
 import com.example.principal.ui.screens.AddEditContactScreen
+import com.example.principal.ui.screens.CreatedScreen
+import com.example.principal.ui.screens.FilterScreen
 import com.example.principal.ui.screens.HomeScreen
-import com.example.principal.viewmodel.AddEditContactViewModel
-import com.example.principal.viewmodel.DetailViewModel
+import com.example.principal.viewmodel.HomeUiState
+import com.example.principal.viewmodel.HomeViewModel
 
 /**
  * Host de navegación de la aplicación.
@@ -33,66 +38,85 @@ import com.example.principal.viewmodel.DetailViewModel
  * El NavController se utiliza para navegar entre estas pantallas.
  */
 
+
 @Composable
 fun NavigationHost() {
+
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "LoginScreen") {
+    NavHost(
+        navController = navController,
+        startDestination = "LoginScreen"
+    ) {
 
-        // LOGIN SCREEN
         composable("LoginScreen") {
             LoginScreen(navController)
         }
 
-        // HOME SCREEN
         composable("HomeScreen") {
             HomeScreen(navController)
         }
 
-        // DETAIL SCREEN
+        // ------------------------
+        // DETAIL
+        // ------------------------
         composable(
             "DetailScreen/{contactId}",
-            arguments = listOf(navArgument("contactId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            // Get the contactId from the back stack entry
-            val contactId = backStackEntry.arguments?.getInt("contactId") ?: 0
-            val viewModel: DetailViewModel = hiltViewModel()
-
-            // Pass the contactId to the DetailScreen composable
-            DetailScreen(
-                navController = navController,
-                viewModel = viewModel,
-                contactId = contactId
-            )
+            arguments = listOf(navArgument("contactId") {
+                type = NavType.IntType
+            })
+        ) {
+            DetailScreen(navController)
         }
 
-        // ADD / EDIT CONTACT SCREEN with contactId
+
+        // ------------------------
+        // ADD / EDIT
+        // ------------------------
         composable(
             "AddEditContact/{contactId}",
-            arguments = listOf(navArgument("contactId") { type = NavType.IntType; defaultValue = -1 })
-        ) { backStackEntry ->
-            // Get the contactId from the back stack entry
-            val contactId = backStackEntry.arguments?.getInt("contactId") ?: -1
-            val viewModel: AddEditContactViewModel = hiltViewModel()
+            arguments = listOf(navArgument("contactId") {
+                type = NavType.IntType
+            })
+        ) { backStack ->
 
-            // If contactId is -1, it's a new contact, otherwise it's an existing one
+            val contactId = backStack.arguments!!.getInt("contactId")
+
+            val viewModel: HomeViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsState()
+
+            val contact =
+                (uiState as? HomeUiState.Success)
+                    ?.contacts
+                    ?.firstOrNull { it.id == contactId }
+
             AddEditContactScreen(
                 navController = navController,
-                contactId = if (contactId != -1) contactId else null,
-                viewModel = viewModel
+                contact = contact
             )
         }
 
-        // ADD NEW CONTACT (No contactId needed here)
+        // ADD NEW
         composable("AddEditContact") {
-            val viewModel: AddEditContactViewModel = hiltViewModel()
+
+            val viewModel: HomeViewModel = hiltViewModel()
+
             AddEditContactScreen(
                 navController = navController,
-                contactId = null,
-                viewModel = viewModel
+                contact = null
             )
+        }
+
+        composable("FilterScreen") {
+            FilterScreen(navController)
+        }
+
+        composable("APIScreen") {
+            APIScreen(navController)
+        }
+
+        composable("CreatedScreen") {
+            CreatedScreen(navController)
         }
     }
 }
-
-

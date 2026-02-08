@@ -10,7 +10,6 @@ import com.example.principal.data.local.entity.ContactEntity
 import kotlinx.coroutines.flow.Flow
 @Dao
 interface ContactDao {
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertContact(contact: ContactEntity)
 
@@ -20,21 +19,16 @@ interface ContactDao {
     @Query("SELECT * FROM contacts ORDER BY id DESC")
     fun getAllContacts(): Flow<List<ContactEntity>>
 
+    @Query("SELECT * FROM contacts WHERE source = :source ORDER BY id DESC")
+    fun getContactsBySource(source: ContactSource): Flow<List<ContactEntity>>
+
     @Delete
     suspend fun deleteContact(contact: ContactEntity)
 
     @Query("DELETE FROM contacts")
     suspend fun deleteAll()
 
-    @Query("SELECT * FROM contacts WHERE source = :source ORDER BY id DESC")
-    fun getContactsBySource(source: ContactSource): Flow<List<ContactEntity>>
-
-    // Change getBySource to return a Flow for consistency
-    @Query("SELECT * FROM contacts WHERE source = :source")
-    fun getBySource(source: ContactSource): Flow<List<ContactEntity>>
-
-    @Query("SELECT * FROM contacts WHERE id = :contactId LIMIT 1")
-    fun getContactById(contactId: Int): Flow<ContactEntity?>
+    @Query("SELECT * FROM contacts WHERE id = :id")
+    suspend fun getContactById(id: Int): ContactEntity?
 }
-
 

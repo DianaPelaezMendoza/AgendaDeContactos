@@ -19,8 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import androidx.navigation.NavController
-import com.example.principal.data.local.entity.ContactEntity
-
 import com.example.principal.viewmodel.DetailViewModel
 
 /**
@@ -59,19 +57,8 @@ fun DetailScreen(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Image(
-                painter = rememberAsyncImagePainter(c.image),
-                contentDescription = "Foto contacto",
-                modifier = Modifier.size(150.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text("${c.firstName} ${c.lastName}", style = MaterialTheme.typography.headlineMedium)
-            Text("${c.city}, ${c.state}")
-            Text(c.phone)
-            Text(c.email)
+            // Use the reusable layout here
+            ContactDetailLayout(contact = c)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -90,7 +77,9 @@ fun DetailScreen(
                     val intent = Intent(Intent.ACTION_DIAL)
                     intent.data = Uri.parse("tel:${c.phone}")
                     context.startActivity(intent)
-                }) { Text("Llamar") }
+                }) {
+                    Text("Llamar")
+                }
 
                 // WhatsApp
                 Button(onClick = {
@@ -98,7 +87,9 @@ fun DetailScreen(
                     val intent = Intent(Intent.ACTION_VIEW)
                     intent.data = Uri.parse(url)
                     context.startActivity(intent)
-                }) { Text("WhatsApp") }
+                }) {
+                    Text("WhatsApp")
+                }
             }
         }
     }

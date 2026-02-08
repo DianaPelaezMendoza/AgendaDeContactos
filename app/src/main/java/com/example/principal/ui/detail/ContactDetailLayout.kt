@@ -28,16 +28,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.principal.data.local.entity.ContactEntity
 
-/**
- * Diseño para mostrar los detalles de un contacto de manera consistente.
- *
- * Este Composable muestra la imagen del contacto, su nombre completo, ciudad, estado, número de teléfono
- * y correo electrónico. Asegura que los detalles del contacto se muestren de manera clara y visualmente atractiva.
- *
- * @param contact El [ContactEntity] que se va a mostrar, que contiene la información del contacto.
- * @param modifier Un [Modifier] para personalizar la apariencia o el comportamiento del diseño (opcional).
- */
-
 @Composable
 fun ContactDetailLayout(
     contact: ContactEntity,

@@ -42,17 +42,6 @@ class DetailViewModel @Inject constructor(
             _contact.value?.let { repository.deleteContact(it) }
         }
     }
-    fun loadContactById(id: Int) {
-        viewModelScope.launch {
-            _contact.value = repository.getContactById(id)
-        }
-    }
-
-    fun getContactById(contactId: Int): ContactEntity? {
-        return _contact.value?.takeIf { it.id == contactId }
-    }
-
-
 }
 
 
