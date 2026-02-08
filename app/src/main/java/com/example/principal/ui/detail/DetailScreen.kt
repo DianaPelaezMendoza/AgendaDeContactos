@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import androidx.navigation.NavController
@@ -42,6 +44,16 @@ fun DetailScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Button(
+                onClick = {
+                    navController.navigate("AddEditContact/${contact.id}")
+                }
+            ) {
+                Icon(Icons.Filled.Edit, contentDescription = "Editar")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Editar")
+            }
+
             Button(onClick = {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${contact.phone}")
