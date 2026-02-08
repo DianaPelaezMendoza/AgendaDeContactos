@@ -37,6 +37,7 @@ class ContactRepository @Inject constructor(
     fun getImportedContacts(): Flow<List<ContactEntity>> = dao.getContactsBySource(ContactSource.IMPORTED)
     fun getCreatedContacts(): Flow<List<ContactEntity>> = dao.getContactsBySource(ContactSource.CREATED)
     suspend fun getContactById(id: Int): ContactEntity? = dao.getContactById(id)
+
 }
 
 

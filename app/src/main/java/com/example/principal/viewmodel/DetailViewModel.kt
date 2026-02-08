@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.principal.data.local.entity.ContactEntity
 import com.example.principal.data.repository.ContactRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
@@ -18,7 +18,6 @@ class DetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val contactId: Int = checkNotNull(savedStateHandle["contactId"])
-
     private val _contact = MutableStateFlow<ContactEntity?>(null)
     val contact: StateFlow<ContactEntity?> = _contact
 
@@ -34,3 +33,5 @@ class DetailViewModel @Inject constructor(
         }
     }
 }
+
+
