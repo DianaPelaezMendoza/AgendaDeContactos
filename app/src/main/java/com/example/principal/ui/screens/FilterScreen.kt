@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterScreen(navController: NavController) {
@@ -27,7 +26,10 @@ fun FilterScreen(navController: NavController) {
                 title = { Text("Filtrar contactos") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver"
+                        )
                     }
                 }
             )
@@ -40,12 +42,14 @@ fun FilterScreen(navController: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Button(onClick = { navController.navigate("AllScreen") }) {
+            Button(onClick = { navController.navigate("HomeScreen") }) {
                 Text("Todos")
             }
+
             Button(onClick = { navController.navigate("APIScreen") }) {
                 Text("Desde API")
             }
+
             Button(onClick = { navController.navigate("CreatedScreen") }) {
                 Text("Creados manualmente")
             }

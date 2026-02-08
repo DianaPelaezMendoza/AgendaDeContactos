@@ -11,6 +11,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.principal.ui.detail.DetailScreen
 import com.example.principal.ui.login.LoginScreen
+import com.example.principal.ui.screens.APIScreen
+import com.example.principal.ui.screens.AddEditContactScreen
+import com.example.principal.ui.screens.CreatedScreen
+import com.example.principal.ui.screens.FilterScreen
 import com.example.principal.ui.screens.HomeScreen
 import com.example.principal.viewmodel.HomeUiState
 import com.example.principal.viewmodel.HomeViewModel
@@ -24,24 +28,14 @@ fun NavigationHost() {
         startDestination = "LoginScreen"
     ) {
 
-        // ----------------------------------
-        // Login Screen
-        // ----------------------------------
         composable("LoginScreen") {
             LoginScreen(navController)
         }
 
-        // ----------------------------------
-        // Home Screen
-        // ----------------------------------
         composable("HomeScreen") {
-            val viewModel: HomeViewModel = hiltViewModel()
-            HomeScreen(navController, viewModel)
+            HomeScreen(navController)
         }
 
-        // ----------------------------------
-        // Detail Screen
-        // ----------------------------------
         composable(
             route = "DetailScreen/{contactId}",
             arguments = listOf(navArgument("contactId") { type = NavType.IntType })
@@ -49,7 +43,6 @@ fun NavigationHost() {
 
             val contactId = backStackEntry.arguments?.getInt("contactId")
             val viewModel: HomeViewModel = hiltViewModel()
-
             val uiState by viewModel.uiState.collectAsState()
 
             if (uiState is HomeUiState.Success && contactId != null) {
@@ -63,5 +56,20 @@ fun NavigationHost() {
             }
         }
 
+        composable("AddEditContact") {
+            AddEditContactScreen(navController)
+        }
+
+        composable("FilterScreen") {
+            FilterScreen(navController)
+        }
+
+        composable("APIScreen") {
+            APIScreen(navController)
+        }
+
+        composable("CreatedScreen") {
+            CreatedScreen(navController)
+        }
     }
 }

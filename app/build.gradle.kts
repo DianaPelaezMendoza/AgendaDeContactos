@@ -54,9 +54,13 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
 
-            //Hilt
+    implementation("androidx.compose.material:material-icons-extended")
+
+
+    //Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.androidx.material3)
     ksp(libs.hilt.compiler)
 
     //Retrofit

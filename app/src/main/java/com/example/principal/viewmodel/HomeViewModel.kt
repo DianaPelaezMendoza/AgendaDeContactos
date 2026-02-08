@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+
 // ----------------------------------
 // Estado de UI para HomeScreen
 // ----------------------------------
@@ -38,23 +40,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // ----------------------------------
-    // IMPORTAR CONTACTOS (SIN LÍMITE)
-    // ----------------------------------
-    fun importContacts() {
-        viewModelScope.launch {
-            _uiState.value = HomeUiState.Loading
-            try {
-                repository.importContacts(limit)
-            } catch (e: Exception) {
-                _uiState.value = HomeUiState.Error("Error al importar contactos")
-            }
-        }
-    }
+
 
     // ----------------------------------
-    // IMPORTAR CONTACTOS DESDE API CON LÍMITE
-    // (1–30, usado por el diálogo)
+    // IMPORTAR CONTACTOS DESDE API CON LÍMITE, 30 lim
     // ----------------------------------
     fun importContactsFromApi(limit: Int) {
         viewModelScope.launch {
