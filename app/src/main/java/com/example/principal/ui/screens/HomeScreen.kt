@@ -25,6 +25,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.principal.ui.detail.NetworkUtil
 
+/**
+* Pantalla principal de la aplicación que muestra la lista de contactos.
+*
+* Permite:
+* - Ver todos los contactos
+* - Filtrar por origen (creados manualmente o importados)
+* - Navegar a la pantalla de detalle de un contacto
+* - Importar contactos desde API (a través de la pantalla API)
+*
+* @param navController Controlador de navegación para moverse entre pantallas.
+* @param viewModel ViewModel que maneja el estado de los contactos.
+*/
+
+
 @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

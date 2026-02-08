@@ -6,7 +6,6 @@ import com.example.principal.data.local.entity.ContactEntity
 import com.example.principal.data.remote.datasource.ApiService
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
-
 class ContactRepository @Inject constructor(
     private val dao: ContactDao,
     private val apiService: ApiService
@@ -30,16 +29,23 @@ class ContactRepository @Inject constructor(
         }
     }
 
+    // Fetch all contacts from the local database
     fun getContacts(): Flow<List<ContactEntity>> = dao.getAllContacts()
+
     suspend fun deleteContact(contact: ContactEntity) = dao.deleteContact(contact)
+
     suspend fun deleteAll() = dao.deleteAll()
+
+    // Insert or update a contact
     suspend fun insertOrUpdate(contact: ContactEntity) = dao.insertContact(contact)
+
+    // Get imported contacts by their source
     fun getImportedContacts(): Flow<List<ContactEntity>> = dao.getContactsBySource(ContactSource.IMPORTED)
+
+    // Get created contacts by their source
     fun getCreatedContacts(): Flow<List<ContactEntity>> = dao.getContactsBySource(ContactSource.CREATED)
-    suspend fun getContactById(id: ContactEntity): Flow<ContactEntity?> = dao.getContactById(id)
 
-
+    // Get contact by ID (returns Flow<ContactEntity?>)
+    fun getContactById(id: Int): Flow<ContactEntity?> = dao.getContactById(id)
 }
-
-
 

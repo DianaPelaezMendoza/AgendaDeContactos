@@ -43,6 +43,22 @@ import com.example.principal.ui.detail.NetworkUtil
 import com.example.principal.ui.screens.components.ContactItem
 import com.example.principal.viewmodel.HomeUiState
 import com.example.principal.viewmodel.HomeViewModel
+
+
+/**
+ * Pantalla que muestra los contactos importados desde la API.
+ *
+ * Verifica si hay conexión a Internet antes de mostrar los datos.
+ * Permite importar un número limitado de contactos (máx. 30) desde la API.
+ * Muestra un mensaje de error si no hay conexión o si ocurre un error al cargar.
+ *
+ * @param navController Controlador de navegación de la app.
+ * @param viewModel ViewModel que maneja la lógica de negocio de los contactos.
+ * @param context Contexto necesario para verificar la conexión a Internet.
+ */
+
+
+
 @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

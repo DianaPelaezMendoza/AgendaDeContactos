@@ -11,6 +11,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel que maneja los detalles de un contacto específico.
+ *
+ * Carga el contacto al inicializarse según el `contactId` recibido.
+ * Permite eliminar el contacto cargado.
+ *
+ * @param repository Repositorio para acceder a los datos de los contactos.
+ * @param savedStateHandle Maneja argumentos pasados a la pantalla.
+ */
+
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     private val repository: ContactRepository,

@@ -29,6 +29,20 @@ import com.example.principal.ui.screens.components.ContactItem
 import com.example.principal.viewmodel.HomeUiState
 import com.example.principal.viewmodel.HomeViewModel
 
+/**
+ * Pantalla que muestra únicamente los contactos creados manualmente.
+ *
+ * Esta pantalla filtra los contactos del ViewModel para mostrar solo aquellos
+ * cuya fuente es [ContactSource.CREATED]. Permite al usuario:
+ * - Ver la lista de contactos creados manualmente.
+ * - Navegar a la pantalla de detalle de un contacto.
+ * - Añadir un nuevo contacto mediante el botón flotante.
+ *
+ * @param navController Controlador de navegación usado para moverse entre pantallas.
+ * @param viewModel ViewModel que maneja el estado y la lista de contactos.
+ */
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreatedScreen(

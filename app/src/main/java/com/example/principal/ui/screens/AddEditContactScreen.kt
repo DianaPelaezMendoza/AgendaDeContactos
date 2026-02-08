@@ -17,6 +17,16 @@ import com.example.principal.data.local.entity.ContactEntity
 import com.example.principal.viewmodel.AddEditContactViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * Pantalla para crear o editar un contacto.
+ *
+ * Si se recibe un contacto existente, carga sus datos para edición.
+ * Permite ingresar nombre, apellido, ciudad, estado, teléfono y email.
+ * Incluye botones para guardar, cancelar o eliminar (solo en edición).
+ *
+ * @param navController Controlador de navegación de la app.
+ * @param contact Contacto existente para edición, o `null` para crear uno nuevo.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditContactScreen(

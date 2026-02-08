@@ -17,6 +17,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+
+
+/**
+ * Pantalla para filtrar contactos según su origen.
+ *
+ * Ofrece botones para mostrar:
+ *  - Todos los contactos
+ *  - Solo los importados desde la API
+ *  - Solo los creados manualmente
+ *
+ * @param navController Controlador de navegación de la app.
+ */
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterScreen(navController: NavController) {

@@ -9,6 +9,21 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel principal que maneja la lista de contactos y operaciones sobre ellos.
+ *
+ * Funciones principales:
+ *  - `importContactsFromApi(limit: Int)` → importa contactos desde la API.
+ *  - `addOrUpdateContact(contact)` → inserta o actualiza un contacto.
+ *  - `deleteContact(contact)` → elimina un contacto.
+ *  - `getContactByIdSync(id)` → obtiene un contacto por ID de manera síncrona.
+ *  - `getImportedContacts()` → flujo de contactos importados.
+ *  - `getCreatedContacts()` → flujo de contactos creados manualmente.
+ *
+ * @param repository Repositorio que maneja la persistencia y API de contactos.
+ */
+
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: ContactRepository
