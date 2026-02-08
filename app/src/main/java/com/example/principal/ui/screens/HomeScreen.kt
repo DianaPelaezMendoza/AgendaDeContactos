@@ -1,5 +1,8 @@
 package com.example.principal.ui.screens
 
+import android.Manifest
+import android.content.Context
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,16 +21,27 @@ import com.example.principal.ui.screens.components.ContactItem
 import com.example.principal.viewmodel.HomeUiState
 import com.example.principal.viewmodel.HomeViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import com.example.principal.ui.detail.NetworkUtil
 
+@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    context: Context = LocalContext.current  // Get the context
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var mostrarDialogImport by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    // comprobacion de internet
+    val hasInternet = NetworkUtil(context)
+    if (!hasInternet) {
+        errorMessage = "No hay conexión a internet. Por favor, revisa tu conexión."
+    }
 
     Scaffold(
         topBar = {
@@ -51,7 +65,13 @@ fun HomeScreen(
 
         bottomBar = {
             Button(
-                onClick = { mostrarDialogImport = true },
+                onClick = {
+                    if (hasInternet) {
+                        mostrarDialogImport = true
+                    } else {
+                        errorMessage = "No se puede importar: sin conexión a internet."
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
@@ -61,54 +81,68 @@ fun HomeScreen(
         }
     ) { padding ->
 
-        when (uiState) {
-            is HomeUiState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(padding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+        // --- mostar mensaje si no hay internet
+        if (errorMessage.isNotEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(errorMessage, color = MaterialTheme.colorScheme.error)
             }
-
-            is HomeUiState.Success -> {
-                val contacts = (uiState as HomeUiState.Success).contacts
-                if (contacts.isEmpty()) {
+        } else {
+            // --- UI STATE HANDLING ---
+            when (uiState) {
+                is HomeUiState.Loading -> {
                     Box(
                         modifier = Modifier.fillMaxSize().padding(padding),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("No hay contactos")
+                        CircularProgressIndicator()
                     }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp)
-                    ) {
-                        items(contacts) { contact ->
-                            ContactItem(contact = contact) {
-                                navController.navigate("DetailScreen/${contact.id}")
+                }
+
+                is HomeUiState.Success -> {
+                    val contacts = (uiState as HomeUiState.Success).contacts
+                    if (contacts.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize().padding(padding),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No hay contactos")
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(padding)
+                                .padding(horizontal = 16.dp)
+                        ) {
+                            items(contacts) { contact ->
+                                ContactItem(contact = contact) {
+                                    navController.navigate("DetailScreen/${contact.id}")
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            is HomeUiState.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(padding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = (uiState as HomeUiState.Error).message,
-                        color = MaterialTheme.colorScheme.error
-                    )
+                is HomeUiState.Error -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize().padding(padding),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = (uiState as HomeUiState.Error).message,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
             }
         }
 
-        // -------------------------------
-        // Dialogo para importar X contactos
-        // -------------------------------
+        // --- DIALOG TO IMPORT CONTACTS ---
         if (mostrarDialogImport) {
             var numContactos by remember { mutableStateOf("") }
             var error by remember { mutableStateOf("") }

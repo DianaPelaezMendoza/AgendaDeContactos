@@ -1,5 +1,8 @@
 package com.example.principal.ui.screens
 
+import android.Manifest
+import android.content.Context
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,22 +33,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.principal.data.local.dao.ContactSource
+import com.example.principal.ui.detail.NetworkUtil
 import com.example.principal.ui.screens.components.ContactItem
 import com.example.principal.viewmodel.HomeUiState
 import com.example.principal.viewmodel.HomeViewModel
+@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun APIScreen(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    context: Context = LocalContext.current  // Get context here
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var mostrarDialogImport by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    // ver si hay internet
+    val hasInternet = NetworkUtil(context)
+
+    // mostarr mensaje que no hay conexion
+    if (!hasInternet) {
+        errorMessage = "No hay conexión a internet. Por favor, revisa tu conexión."
+    }
 
     Scaffold(
         topBar = {
@@ -60,62 +76,77 @@ fun APIScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { mostrarDialogImport = true }) {
-                        Icon(
-                            Icons.Filled.CloudDownload,
-                            contentDescription = "Importar desde API"
-                        )
+                    // nostar mensaje solo is hay conexion
+                    if (hasInternet) {
+                        IconButton(onClick = { mostrarDialogImport = true }) {
+                            Icon(
+                                Icons.Filled.CloudDownload,
+                                contentDescription = "Importar desde API"
+                            )
+                        }
                     }
                 }
             )
         }
     ) { padding ->
 
-        when (uiState) {
-            is HomeUiState.Success -> {
-                val contacts = (uiState as HomeUiState.Success).contacts
-                    .filter { it.source == ContactSource.IMPORTED }
+        // si no hay internet
+        if (errorMessage.isNotEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(errorMessage, color = MaterialTheme.colorScheme.error)
+            }
+        } else {
+            when (uiState) {
+                is HomeUiState.Success -> {
+                    val contacts = (uiState as HomeUiState.Success).contacts
+                        .filter { it.source == ContactSource.IMPORTED }
 
-                if (contacts.isEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(padding),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("No hay contactos importados")
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(padding)
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        items(contacts) { contact ->
-                            ContactItem(contact = contact) {
-                                navController.navigate("DetailScreen/${contact.id}")
+                    if (contacts.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(padding),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No hay contactos importados")
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(padding)
+                                .padding(horizontal = 16.dp)
+                        ) {
+                            items(contacts) { contact ->
+                                ContactItem(contact = contact) {
+                                    navController.navigate("DetailScreen/${contact.id}")
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            is HomeUiState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+                is HomeUiState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
-            }
 
-            is HomeUiState.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Error al cargar contactos")
+                is HomeUiState.Error -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Error al cargar contactos")
+                    }
                 }
             }
         }
