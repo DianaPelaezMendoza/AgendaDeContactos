@@ -41,11 +41,13 @@ object AppModule {
     }
 
     // Room Database
+    @Suppress("DEPRECATION")
     @Provides
     @Singleton
     fun provideDatabase(app: Application): AppDatabase {
          return Room.databaseBuilder(app, AppDatabase::class.java, "contacts_db")
-            .build()
+             .fallbackToDestructiveMigration()
+             .build()
     }
     // DAO
     @Provides
