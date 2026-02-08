@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.ui.graphics)
     ksp(libs.hilt.compiler)
 
     //Retrofit

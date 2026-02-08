@@ -28,7 +28,7 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    fun deleteContact() {
+    fun deleteContact(c: ContactEntity) {
         viewModelScope.launch {
             _contact.value?.let { repository.deleteContact(it) }
         }
