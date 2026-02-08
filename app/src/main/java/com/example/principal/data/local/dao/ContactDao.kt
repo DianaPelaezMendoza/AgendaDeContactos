@@ -19,16 +19,20 @@ interface ContactDao {
     @Query("SELECT * FROM contacts ORDER BY id DESC")
     fun getAllContacts(): Flow<List<ContactEntity>>
 
-    @Query("SELECT * FROM contacts WHERE source = :source ORDER BY id DESC")
-    fun getContactsBySource(source: ContactSource): Flow<List<ContactEntity>>
-
     @Delete
     suspend fun deleteContact(contact: ContactEntity)
 
     @Query("DELETE FROM contacts")
     suspend fun deleteAll()
 
-    @Query("SELECT * FROM contacts WHERE id = :id")
-    suspend fun getContactById(id: Int): ContactEntity?
+    @Query("SELECT * FROM contacts WHERE source = :source ORDER BY id DESC")
+    fun getContactsBySource(source: ContactSource): Flow<List<ContactEntity>>
+
+    @Query("SELECT * FROM contacts WHERE source = :source")
+    fun getBySource(source: ContactSource): List<ContactEntity>
+
+    @Query("SELECT * FROM contacts WHERE id = :contactId LIMIT 1")
+    fun getContactById(contactId: ContactEntity): Flow<ContactEntity?>
+
 }
 

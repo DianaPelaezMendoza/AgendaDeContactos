@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,8 +19,10 @@ class AddEditContactViewModel @Inject constructor(
     private val _contact = MutableStateFlow<ContactEntity?>(null)
     val contact: StateFlow<ContactEntity?> = _contact
 
-    fun loadContact(contact: ContactEntity?) {
-        _contact.value = contact
+    fun loadContact(contactId: Int) {
+        viewModelScope.launch {
+            _contact.value = repository.getContactById(contactId)
+        }
     }
 
     fun saveContact(contact: ContactEntity) {
@@ -33,4 +36,12 @@ class AddEditContactViewModel @Inject constructor(
             repository.deleteContact(contact)
         }
     }
+
+    fun getContactByIdSync(contactId: Int): ContactEntity? {
+        return runBlocking {
+            dao.getContactByIdSync(contactId)
+        }
+    }
+
 }
+

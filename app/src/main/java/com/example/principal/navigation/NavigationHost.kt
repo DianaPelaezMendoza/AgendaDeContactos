@@ -1,8 +1,6 @@
 package com.example.principal.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -11,92 +9,70 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.principal.ui.detail.DetailScreen
 import com.example.principal.ui.login.LoginScreen
-import com.example.principal.ui.screens.APIScreen
 import com.example.principal.ui.screens.AddEditContactScreen
-import com.example.principal.ui.screens.CreatedScreen
-import com.example.principal.ui.screens.FilterScreen
 import com.example.principal.ui.screens.HomeScreen
-import com.example.principal.viewmodel.HomeUiState
-import com.example.principal.viewmodel.HomeViewModel
+import com.example.principal.viewmodel.AddEditContactViewModel
+import com.example.principal.viewmodel.DetailViewModel
 
 @Composable
 fun NavigationHost() {
-
     val navController = rememberNavController()
 
-    NavHost(
-        navController = navController,
-        startDestination = "LoginScreen"
-    ) {
+    NavHost(navController = navController, startDestination = "LoginScreen") {
 
+        // LOGIN
         composable("LoginScreen") {
             LoginScreen(navController)
         }
 
+        // HOME
         composable("HomeScreen") {
             HomeScreen(navController)
         }
 
-        // ------------------------
-        // DETAIL
-        // ------------------------
+        // DETAIL SCREEN
         composable(
             "DetailScreen/{contactId}",
             arguments = listOf(navArgument("contactId") {
                 type = NavType.IntType
             })
-        ) {
-            DetailScreen(navController)
+        ) { backStackEntry ->
+            val contactId = backStackEntry.arguments?.getInt("contactId") ?: 0
+            val viewModel: DetailViewModel = hiltViewModel()
+
+            DetailScreen(
+                navController = navController,
+                viewModel = viewModel,
+                contactId = contactId
+            )
         }
 
-
-        // ------------------------
-        // ADD / EDIT
-        // ------------------------
+        // ADD / EDIT SCREEN
         composable(
             "AddEditContact/{contactId}",
             arguments = listOf(navArgument("contactId") {
                 type = NavType.IntType
+                defaultValue = -1
             })
-        ) { backStack ->
-
-            val contactId = backStack.arguments!!.getInt("contactId")
-
-            val viewModel: HomeViewModel = hiltViewModel()
-            val uiState by viewModel.uiState.collectAsState()
-
-            val contact =
-                (uiState as? HomeUiState.Success)
-                    ?.contacts
-                    ?.firstOrNull { it.id == contactId }
+        ) { backStackEntry ->
+            val contactId = backStackEntry.arguments?.getInt("contactId") ?: -1
+            val viewModel: AddEditContactViewModel = hiltViewModel()
 
             AddEditContactScreen(
                 navController = navController,
-                contact = contact
+                contactId = if (contactId != -1) contactId else null,
+                viewModel = viewModel
             )
         }
 
-        // ADD NEW
+        // ADD NEW CONTACT
         composable("AddEditContact") {
-
-            val viewModel: HomeViewModel = hiltViewModel()
-
+            val viewModel: AddEditContactViewModel = hiltViewModel()
             AddEditContactScreen(
                 navController = navController,
-                contact = null
+                contactId = null,
+                viewModel = viewModel
             )
-        }
-
-        composable("FilterScreen") {
-            FilterScreen(navController)
-        }
-
-        composable("APIScreen") {
-            APIScreen(navController)
-        }
-
-        composable("CreatedScreen") {
-            CreatedScreen(navController)
         }
     }
 }
