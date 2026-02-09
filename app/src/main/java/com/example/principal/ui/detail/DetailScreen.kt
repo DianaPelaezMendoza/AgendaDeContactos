@@ -17,6 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.principal.viewmodel.DetailViewModel
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
+import coil.compose.rememberAsyncImagePainter
+import com.example.principal.data.local.entity.ContactEntity
 
 /**
  * Pantalla de detalle de un contacto.
@@ -41,9 +49,10 @@ fun DetailScreen(
     contactId: Int
 ) {
     val context = LocalContext.current
-    val contact by viewModel.contact.collectAsState()
+    val contactState by viewModel.contact.collectAsState()
 
-    if (contact == null) {
+    if (contactState == null) {
+        // Pantalla de carga
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -51,57 +60,22 @@ fun DetailScreen(
             CircularProgressIndicator()
         }
     } else {
-        val c = contact!!
-        TopAppBar(
-            title = { Text("Detalle de contacto") },
-            navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver"
-                    )
-                }
+        val contact = contactState!!
+
+        ContactDetailLayout (
+            contact = contact,
+            onBackClick = { navController.popBackStack() },
+            onEditClick = { navController.navigate("AddEditContact/${contact.id}") },
+            onCallClick = {
+                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${contact.phone}"))
+                context.startActivity(intent)
+            },
+            onWhatsAppClick = {
+                val url = "https://wa.me/${contact.phone}"
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                context.startActivity(intent)
             }
         )
-
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Use the reusable layout here
-            ContactDetailLayout(contact = c)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                // Editar
-                Button(
-                    onClick = { navController.navigate("AddEditContact/${c.id}") }
-                ) {
-                    Icon(Icons.Filled.Edit, contentDescription = "Editar")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Editar")
-                }
-
-                // Llamar
-                Button(onClick = {
-                    val intent = Intent(Intent.ACTION_DIAL)
-                    intent.data = Uri.parse("tel:${c.phone}")
-                    context.startActivity(intent)
-                }) {
-                    Text("Llamar")
-                }
-
-                // WhatsApp
-                Button(onClick = {
-                    val url = "https://wa.me/${c.phone}"
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.data = Uri.parse(url)
-                    context.startActivity(intent)
-                }) {
-                    Text("WhatsApp")
-                }
-            }
-        }
     }
 }
+
