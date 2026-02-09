@@ -179,7 +179,7 @@ fun APIScreen(
                     Column {
                         Text(
                             "Introduce cuántos contactos deseas importar. " +
-                                    "Puedes importar hasta 30 contactos por vez."
+                                    "maximo de 30 contactos por cada llamada"
                         )
                         OutlinedTextField(
                             value = numContactos,

@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.compose.remote.creation.core)
     ksp(libs.hilt.compiler)
 
     //Retrofit

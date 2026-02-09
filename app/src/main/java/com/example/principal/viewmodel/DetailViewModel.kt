@@ -20,7 +20,6 @@ import javax.inject.Inject
  * @param repository Repositorio para acceder a los datos de los contactos.
  * @param savedStateHandle Maneja argumentos pasados a la pantalla.
  */
-
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     private val repository: ContactRepository,
@@ -31,8 +30,10 @@ class DetailViewModel @Inject constructor(
     private val _contact = MutableStateFlow<ContactEntity?>(null)
     val contact: StateFlow<ContactEntity?> = _contact
 
+    // Initialize the ViewModel and load the contact data
     init {
         viewModelScope.launch {
+            // Fetch the contact by ID and update _contact value
             _contact.value = repository.getContactById(contactId)
         }
     }
@@ -43,5 +44,3 @@ class DetailViewModel @Inject constructor(
         }
     }
 }
-
-

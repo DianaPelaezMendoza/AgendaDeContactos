@@ -18,6 +18,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -26,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +39,7 @@ import androidx.navigation.NavHostController
 import com.example.principal.data.local.dao.ContactSource
 import com.example.principal.data.local.entity.ContactEntity
 import com.example.principal.viewmodel.AddEditContactViewModel
+import kotlinx.coroutines.launch
 
 /**
  * Pantalla para crear o editar un contacto.
@@ -51,17 +55,20 @@ import com.example.principal.viewmodel.AddEditContactViewModel
 @Composable
 fun AddEditContactScreen(
     navController: NavHostController,
-    contact: ContactEntity? = null
+    contactId: Int? = null,
+    viewModel: AddEditContactViewModel = hiltViewModel()
 ) {
-    val viewModel: AddEditContactViewModel = hiltViewModel()
+    val scope = rememberCoroutineScope()
 
-    // Cargar contacto
-    LaunchedEffect(contact) {
-        viewModel.loadContact(contact)
+    // Cargar el contacto si es edición
+    LaunchedEffect(contactId) {
+        contactId?.let { viewModel.loadContact(it) }
     }
 
+    // Observamos el estado del contacto en el ViewModel
     val existingContact by viewModel.contact.collectAsState()
 
+    // Guardamos los valores del contacto en los campos
     var firstName by remember { mutableStateOf(existingContact?.firstName ?: "") }
     var lastName by remember { mutableStateOf(existingContact?.lastName ?: "") }
     var city by remember { mutableStateOf(existingContact?.city ?: "") }
@@ -69,6 +76,7 @@ fun AddEditContactScreen(
     var phone by remember { mutableStateOf(existingContact?.phone ?: "") }
     var email by remember { mutableStateOf(existingContact?.email ?: "") }
 
+    // Actualizamos los valores si el contacto cambia
     LaunchedEffect(existingContact) {
         existingContact?.let {
             firstName = it.firstName
@@ -80,17 +88,23 @@ fun AddEditContactScreen(
         }
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(if (existingContact == null) "Crear contacto" else "Editar contacto") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver"
+                        )
                     }
                 }
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { padding ->
             Column(
                 modifier = Modifier
@@ -110,44 +124,37 @@ fun AddEditContactScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Button(
-                        onClick = {
-                            val newContact = ContactEntity(
-                                id = existingContact?.id ?: 0,
-                                firstName = firstName,
-                                lastName = lastName,
-                                city = city,
-                                state = state,
-                                phone = phone,
-                                email = email,
-                                thumbnail = existingContact?.thumbnail ?: "",
-                                image = existingContact?.image ?: "",
-                                source = existingContact?.source ?: ContactSource.CREATED
-                            )
-                            viewModel.saveContact(newContact)
-                            navController.popBackStack()
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("Guardar") }
+                    Button(onClick = {
+                        val newContact = ContactEntity(
+                            id = existingContact?.id ?: 0,
+                            firstName = firstName,
+                            lastName = lastName,
+                            city = city,
+                            state = state,
+                            phone = phone,
+                            email = email,
+                            thumbnail = existingContact?.thumbnail ?: "",
+                            image = existingContact?.image ?: "",
+                            source = existingContact?.source ?: ContactSource.CREATED
+                        )
+                        viewModel.saveContact(newContact)
+                        navController.popBackStack()
+                    }, modifier = Modifier.weight(1f)) { Text("Guardar") }
 
-                    Button(
-                        onClick = { navController.popBackStack() },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-                        modifier = Modifier.weight(1f)
-                    ) { Text("Cancelar") }
+                    Button(onClick = { navController.popBackStack() }, colors = ButtonDefaults.buttonColors(containerColor = Color.Gray), modifier = Modifier.weight(1f)) { Text("Cancelar") }
                 }
 
-                // Botón eliminar solo si es edición
-                if (existingContact != null) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = {
-                            viewModel.deleteContact(existingContact!!)
+                // Botón eliminar siempre visible
+                Button(onClick = {
+                    existingContact?.let {
+                        scope.launch {
+                            viewModel.deleteContact(it)
+                            snackbarHostState.showSnackbar("Contacto eliminado")
                             navController.popBackStack()
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                        modifier = Modifier.fillMaxWidth()
-                    ) { Text("Eliminar", color = Color.White) }
+                        }
+                    }
+                }, colors = ButtonDefaults.buttonColors(containerColor = Color.Red), modifier = Modifier.fillMaxWidth()) {
+                    Text("Eliminar", color = Color.White)
                 }
             }
         }

@@ -31,14 +31,22 @@ class ContactRepository @Inject constructor(
     }
 
     fun getContacts(): Flow<List<ContactEntity>> = dao.getAllContacts()
+
     suspend fun deleteContact(contact: ContactEntity) = dao.deleteContact(contact)
+
     suspend fun deleteAll() = dao.deleteAll()
+
     suspend fun insertOrUpdate(contact: ContactEntity) = dao.insertContact(contact)
-    fun getImportedContacts(): Flow<List<ContactEntity>> = dao.getContactsBySource(ContactSource.IMPORTED)
-    fun getCreatedContacts(): Flow<List<ContactEntity>> = dao.getContactsBySource(ContactSource.CREATED)
-    suspend fun getContactById(id: Int): ContactEntity? = dao.getContactById(id)
 
+    fun getImportedContacts(): Flow<List<ContactEntity>> =
+        dao.getContactsBySource(ContactSource.IMPORTED)
+
+    fun getCreatedContacts(): Flow<List<ContactEntity>> =
+        dao.getContactsBySource(ContactSource.CREATED)
+
+    suspend fun getContactById(id: Int): ContactEntity? {
+        return dao.getContactById(id)  // Call the suspend function from DAO directly
+    }
 }
-
 
 
