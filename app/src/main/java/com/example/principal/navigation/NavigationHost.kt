@@ -9,7 +9,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.principal.ui.detail.DetailScreen
 import com.example.principal.ui.login.LoginScreen
+import com.example.principal.ui.screens.APIScreen
 import com.example.principal.ui.screens.AddEditContactScreen
+import com.example.principal.ui.screens.CreatedScreen
+import com.example.principal.ui.screens.FilterScreen
 import com.example.principal.ui.screens.HomeScreen
 import com.example.principal.viewmodel.AddEditContactViewModel
 import com.example.principal.viewmodel.DetailViewModel
@@ -67,7 +70,9 @@ fun NavigationHost() {
         // ADD / EDIT CONTACT SCREEN with contactId
         composable(
             "AddEditContact/{contactId}",
-            arguments = listOf(navArgument("contactId") { type = NavType.IntType; defaultValue = -1 })
+            arguments = listOf(navArgument("contactId") {
+                type = NavType.IntType; defaultValue = -1
+            })
         ) { backStackEntry ->
             val contactId = backStackEntry.arguments?.getInt("contactId") ?: -1
             val viewModel: AddEditContactViewModel = hiltViewModel()
@@ -88,6 +93,18 @@ fun NavigationHost() {
                 contactId = null,
                 viewModel = viewModel
             )
+        }
+
+        composable("FilterScreen") {
+            FilterScreen(navController)
+        }
+
+        composable("APIScreen") {
+            APIScreen(navController)
+        }
+
+        composable("CreatedScreen") {
+            CreatedScreen(navController)
         }
     }
 }
