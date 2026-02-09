@@ -8,6 +8,6 @@ interface ApiService {
 
     @GET(".")
     suspend fun getContacts(
-        @Query("results") results: Int = 10
+        @Query("results") results: Int
     ): ApiResponse
 }

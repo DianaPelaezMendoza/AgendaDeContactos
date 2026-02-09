@@ -5,8 +5,10 @@ import android.content.Context
 import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -65,18 +67,18 @@ import com.example.principal.viewmodel.HomeViewModel
 fun APIScreen(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel(),
-    context: Context = LocalContext.current  // Get context here
+    context: Context = LocalContext.current
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
     var mostrarDialogImport by remember { mutableStateOf(false) }
+    var cantidadImportar by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-    // ver si hay internet
     val hasInternet = NetworkUtil(context)
 
-    // mostarr mensaje que no hay conexion
     if (!hasInternet) {
-        errorMessage = "No hay conexión a internet. Por favor, revisa tu conexión."
+        errorMessage = "No hay conexión a internet. Revisa tu conexión."
     }
 
     Scaffold(
@@ -92,7 +94,6 @@ fun APIScreen(
                     }
                 },
                 actions = {
-                    // nostar mensaje solo is hay conexion
                     if (hasInternet) {
                         IconButton(onClick = { mostrarDialogImport = true }) {
                             Icon(
@@ -106,7 +107,6 @@ fun APIScreen(
         }
     ) { padding ->
 
-        // si no hay internet
         if (errorMessage.isNotEmpty()) {
             Box(
                 modifier = Modifier
@@ -118,6 +118,16 @@ fun APIScreen(
             }
         } else {
             when (uiState) {
+
+                is HomeUiState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
                 is HomeUiState.Success -> {
                     val contacts = (uiState as HomeUiState.Success).contacts
                         .filter { it.source == ContactSource.IMPORTED }
@@ -147,72 +157,64 @@ fun APIScreen(
                     }
                 }
 
-                is HomeUiState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
-
                 is HomeUiState.Error -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("Error al cargar contactos")
+                        Text(
+                            text = (uiState as HomeUiState.Error).message,
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
                 }
             }
         }
+    }
 
-        // -------- Dialogo importar X contactos --------
-        if (mostrarDialogImport) {
-            var numContactos by remember { mutableStateOf("") }
-            var error by remember { mutableStateOf("") }
+    // 🔹 DIALOGO PARA IMPORTAR CONTACTOS
+    if (mostrarDialogImport) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogImport = false },
+            title = { Text("Importar contactos") },
+            text = {
+                Column {
+                    Text("Ingresa la cantidad de contactos (1 a 30)")
+                    Spacer(modifier = Modifier.height(8.dp))
 
-            AlertDialog(
-                onDismissRequest = { mostrarDialogImport = false },
-                title = { Text("Importar desde API") },
-                text = {
-                    Column {
-                        Text(
-                            "Introduce cuántos contactos deseas importar. " +
-                                    "maximo de 30 contactos por cada llamada"
-                        )
-                        OutlinedTextField(
-                            value = numContactos,
-                            onValueChange = { numContactos = it },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
-                            ),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        if (error.isNotEmpty()) {
-                            Text(error, color = MaterialTheme.colorScheme.error)
-                        }
-                    }
-                },
-                confirmButton = {
-                    Button(onClick = {
-                        val limite = numContactos.toIntOrNull()
-                        if (limite == null || limite !in 1..30) {
-                            error = "Introduce un número entre 1 y 30"
-                        } else {
-                            viewModel.importContactsFromApi(limite)
-                            mostrarDialogImport = false
-                        }
-                    }) {
-                        Text("Aceptar")
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = { mostrarDialogImport = false }) {
-                        Text("Cancelar")
-                    }
+                    OutlinedTextField(
+                        value = cantidadImportar,
+                        onValueChange = { cantidadImportar = it },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
-            )
-        }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val cantidad = cantidadImportar.toIntOrNull()
+                        if (cantidad != null && cantidad in 1..30) {
+                            viewModel.importContactsFromApi(cantidad)
+                            mostrarDialogImport = false
+                            cantidadImportar = ""
+                        } else {
+                            errorMessage = "Número inválido (1 a 30)"
+                        }
+                    }
+                ) {
+                    Text("Importar")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { mostrarDialogImport = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 }
+
+

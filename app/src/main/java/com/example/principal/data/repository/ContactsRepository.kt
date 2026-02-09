@@ -13,7 +13,7 @@ class ContactRepository @Inject constructor(
 ) {
 
     suspend fun importContacts(limit: Int) {
-        val response = apiService.getContacts()
+        val response = apiService.getContacts(limit)
         response.results.forEach { user ->
             val entity = ContactEntity(
                 firstName = user.name.first,
